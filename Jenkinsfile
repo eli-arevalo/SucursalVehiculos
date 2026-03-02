@@ -18,22 +18,27 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
-      steps {
-        sh '''
-          cat > Dockerfile <<'EOF'
-          FROM tomcat:9.0-jdk17
-          RUN rm -rf /usr/local/tomcat/webapps/*
-          COPY target/*.war /usr/local/tomcat/webapps/ROOT.war
-          EXPOSE 8080
-          EOF
-
-          docker build -t vehiculos_tomcat:latest .
-        '''
-      }
+   stage('Build Docker Image') {
+    steps {
+      sh '''
+        echo "== Target contents =="
+        ls -la target
+  
+        cat > Dockerfile <<'EOF'
+        FROM tomcat:9.0-jdk17
+        RUN rm -rf /usr/local/tomcat/webapps/*
+        COPY target/vehiculosBuild.war /usr/local/tomcat/webapps/ROOT.war
+        EXPOSE 8080
+        EOF
+  
+        docker build -t vehiculos_tomcat:latest .
+        echo "== Docker images =="
+        docker images | head
+      '''
     }
+  }
 
-    stage('Deploy') {
+stage('Deploy') {
       steps {
         sh '''
           docker stop contenedor_sucursal || true
